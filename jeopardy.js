@@ -1,6 +1,4 @@
 //http://jservice.io/
-const NUM_CATEGORIES = 6;
-const NUM_QUESTIONS_PER_CAT = 5;
 
 // categories is the main data structure for the app; it looks like this:
 
@@ -81,10 +79,10 @@ async function getCategory(listOfRandomCatIds) {
     answer: c.answer,
     showing: null,
   }));
-  console.log("getCategory(listOfRandomCatIds)", { title: cat.title, clues });
+  // console.log("getCategory(listOfRandomCatIds)", { title: cat.title, clues });
   return { title: cat.title, clues };
 }
-
+//why is listOfRandomCatIds undefined
 getCategory();
 
 /** Fill the HTML table#jeopardy with the categories & cells for questions.
@@ -98,36 +96,37 @@ getCategory();
 // let table = document.querySelector("#jeopardyTable");
 // let columm = getCategory();
 
-async function fillTable() {
-  await getCategory();
-
+//argument or paramaters
+function fillTable(gameData) {
   const headRow = document.createElement("tr");
-  const tableBody = document.querySelector("tbody");
+  const tableHeading = document.querySelector("thead");
 
-  for (let x = 0; x < NUM_CATEGORIES; x++) {
-    const headCell = document.createElement("th");
-
-    headCell.innerHTML = `<div class="cell-container">${cat.title}</div>`;
-    headRow.appendChild(headCell);
-    tableBody.appendChild(headRow);
+  const tableRows = [];
+  for (let i = 0; i < 5; i++) {
+    const row = document.createElement("tr");
+    tableRows.push(row);
   }
 
-  for (let row = 0; row < NUM_QUESTIONS_PER_CAT; row++) {
-    const bodyRow = document.createElement("tr");
-
-    for (let col = 0; col < NUM_CATEGORIES; col++) {
-      const bodyCell = document.createElement("td");
-      bodyCell.id = `${col}-${row}`;
-      bodyCell.innerHTML = `<div class="dollar-value">$${categories[col].clues[row].value}</div>`;
-
-      bodyCell.addEventListener("click", handleClick);
-
-      bodyRow.appendChild(bodyCell);
+  for (let cat in gameData) {
+    const headCell = document.createElement("th");
+    //using a variable to link into an object
+    headCell.innerHTML = gameData[cat].title;
+    headRow.appendChild(headCell);
+    tableHeading.appendChild(headRow);
+    for (let i = 0; i < tableRows.length; i++) {
+      const cell = document.createElement("td");
+      const tableBody = document.querySelector("tbody");
+      cell.dataQuestion = gameData[cat].clues[i].question;
+      cell.dataAnswer = gameData[cat].clues[i].answer;
+      cell.innerHTML = "?";
+      cell.addEventListener("click", () => {
+        handleClueClick(cell);
+      });
+      tableRows[i].appendChild(cell);
+      tableBody.appendChild(tableRows[i]);
     }
-    tableBody.appendChild(bodyRow);
   }
 }
-
 fillTable();
 
 /** Handle clicking on a clue: show the question or answer.
@@ -138,7 +137,13 @@ fillTable();
  * - if currently "answer", ignore click
  * */
 
-function handleClick(evt) {}
+function handleClueClick(cell) {
+  if (cell.innerHTML === "?") {
+    cell.innerHTML = cell.dataQuestion;
+  } else if (cell.innerHTML === cell.dataQuestion) {
+    cell.innerHTML = cell.dataAnswer;
+  }
+}
 
 /** Wipe the current Jeopardy board, show the loading spinner,
  * and update the button used to fetch data.
@@ -163,8 +168,8 @@ async function setupAndStart() {
   for (let id of randomIds) {
     gameData[id] = await getCategory(id);
   }
-
-  //   console.log("gamedata ", gameData);
+  fillTable(gameData);
+  // console.log("gamedata ", gameData);
 }
 
 /** On click of start / restart button, set up game. */
@@ -174,7 +179,7 @@ async function setupAndStart() {
 const restartBtn = document.getElementById("restartBtn");
 restartBtn.addEventListener("click", async function () {
   let newGame = document.querySelector("#jeopardyTable");
-  newGame.innerHTML = "";
+  newGame.innerHTML = setupAndStart();
   await setupAndStart();
 });
 
