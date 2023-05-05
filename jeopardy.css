@@ -6,24 +6,44 @@
   #74119c
 */
 
-td,
-th {
-  border: 1px solid black;
-  padding: 50px;
-  width: 40px;
-  height: 40px;
+html {
+  box-sizing: border-box;
+  height: 100dvh;
+  width: 100dvw;
+  padding: 0px;
+  margin: 0px;
+}
+body {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100dvw;
+  height: 100dvh;
+
+  background-color: #141458;
 }
 
 table {
   text-align: center;
-  position: relative;
-  width: 60%;
-  height: 70%;
+  height: 100dvh;
+  width: 100dvw;
+  position: absolute;
 }
 
 #jeopardyTable th,
 #jeopardyTable td {
-  border: solid 1px white;
+  border: solid 1px black;
   width: 12em;
   padding: 1em;
+  background-color: #060ce9;
+  color: rgb(254, 237, 150);
+}
+#restartBtn {
+  position: absolute;
+  top: 100%;
+  justify-content: center;
+  background-color: #74119c;
+
+  color: #28a200;
 }
